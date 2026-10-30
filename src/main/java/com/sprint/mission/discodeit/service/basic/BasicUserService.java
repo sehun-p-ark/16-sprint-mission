@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.BinaryContentDto;
-import com.sprint.mission.discodeit.dto.UserCreateDto;
-import com.sprint.mission.discodeit.dto.UserDto;
-import com.sprint.mission.discodeit.dto.UserUpdateDto;
+import com.sprint.mission.discodeit.dto.user.UserCreateDto;
+import com.sprint.mission.discodeit.dto.user.UserDto;
+import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -181,6 +181,34 @@ public class BasicUserService implements UserService {
                                 "사용자가 존재하지 않습니다."
                         )
                 );
+
+        if (dto.username() != null){ // 아룸 중복 방지 로직
+            if (dto.username().equals(user.getUsername())) {
+                throw new IllegalArgumentException(
+                        "현재 사용자 이름과 동일합니다."
+                );
+            }
+            if (userRepository.findByUsername(dto.username()).isPresent()) {
+                throw new IllegalArgumentException(
+                        "이미 존재하는 사용자 이름입니다."
+                );
+            }
+        }
+
+        if (dto.age() != null){
+            validator.validatePositiveOrZero(
+                    dto.age(),
+                    "나이는 0 이상이어야 합니다."
+            );
+        }
+
+        if (dto.password() != null){
+            validator.validateNotBlank(
+                    dto.password(),
+                    "비밀번호는 비어있을 수 없습니다."
+            );
+        }
+
         // 이름, 나이 변경
         user.update(dto.username(), dto.age(), dto.password());
 
@@ -221,16 +249,17 @@ public class BasicUserService implements UserService {
                                 "사용자가 존재하지 않습니다."
                         )
                 );
-        if (user.getProfileId() != null) {
+
+        if (user.getProfileId() != null) { // binary 삭제
             binaryContentRepository
                     .findById(user.getProfileId())
                     .ifPresent(binaryContentRepository::delete);
         }
 
-        userStatusRepository.findByUserId(id)
+        userStatusRepository.findByUserId(id) // status 삭제
                 .ifPresent(userStatusRepository::delete);
 
-        userRepository.delete(user);
+        userRepository.delete(user); // user 삭제
     }
 
     // User -> UserDto로 변환 하는 메서드
