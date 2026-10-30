@@ -1,21 +1,20 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
-public class DiscordService {
+@Service
+public class DiscodeService {
 
     private final UserService userService;
     private final ChannelService channelService;
     private final MessageService messageService;
 
-    public DiscordService(UserService userService,
+    public DiscodeService(UserService userService,
                           ChannelService channelService,
                           MessageService messageService) {
         this.userService = userService;

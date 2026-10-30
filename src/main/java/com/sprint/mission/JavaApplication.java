@@ -10,17 +10,13 @@ import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.DiscodeService;
 import com.sprint.mission.discodeit.service.file.FileChannelService;
 import com.sprint.mission.discodeit.service.file.FileMessageService;
 import com.sprint.mission.discodeit.service.file.FileUserService;
-import com.sprint.mission.discodeit.service.jcf.DiscordService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,8 +30,8 @@ public class JavaApplication {
 //                new JCFChannelService(userService);
 //        MessageService messageService =
 //                new JCFMessageService(userService, channelService);
-//        DiscordService discordService =
-//                new DiscordService(userService, channelService, messageService);
+//        DiscodeService discodeService =
+//                new DiscodeService(userService, channelService, messageService);
         // Repository 생성
         UserRepository userRepository = new FileUserRepository();
 
@@ -54,8 +50,8 @@ public class JavaApplication {
         MessageService messageService =
                 new FileMessageService(messageRepository, userService, channelService);
 
-        DiscordService discordService =
-                new DiscordService(userService, channelService, messageService);
+        DiscodeService discodeService =
+                new DiscodeService(userService, channelService, messageService);
 
         // USER
         System.out.println("=== User 생성 ===");
@@ -337,7 +333,7 @@ public class JavaApplication {
         System.out.println("MESSAGES : ");
         System.out.println(messageService.findAll());
 
-        discordService.deleteUser(sehun.getId());
+        discodeService.deleteUser(sehun.getId());
 
         System.out.println("===============================");
         System.out.println("세훈 삭제 후");
