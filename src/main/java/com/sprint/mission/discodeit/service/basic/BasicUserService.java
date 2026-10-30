@@ -23,8 +23,6 @@ import java.util.UUID;
 public class BasicUserService implements UserService {
 
     private final UserRepository userRepository;
-    private final ChannelRepository channelRepository;
-    private final MessageRepository messageRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final UserStatusRepository userStatusRepository;
     private final CommonValidator validator;
@@ -154,6 +152,7 @@ public class BasicUserService implements UserService {
                                 "사용자가 존재하지 않습니다."
                         )
                 );
+
         return toDto(user);
     }
 
@@ -209,6 +208,30 @@ public class BasicUserService implements UserService {
         return toDto(savedUser); // dto변환 후 반환
     }
 
+    @Override
+    public void deleteUser(UUID id) {
+        validator.validateNotNull(
+                id,
+                "사용자 ID는 null일 수 없습니다."
+        );
+
+        User user = userRepository.findById(id)
+                .orElseThrow(() ->
+                        new NoSuchElementException(
+                                "사용자가 존재하지 않습니다."
+                        )
+                );
+        if (user.getProfileId() != null) {
+            binaryContentRepository
+                    .findById(user.getProfileId())
+                    .ifPresent(binaryContentRepository::delete);
+        }
+
+        userStatusRepository.findByUserId(id)
+                .ifPresent(userStatusRepository::delete);
+
+        userRepository.delete(user);
+    }
 
     // User -> UserDto로 변환 하는 메서드
     private UserDto toDto(User user) {
