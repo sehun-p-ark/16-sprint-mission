@@ -13,8 +13,12 @@ public class Channel extends Base {
     private String description;
 
     public void update(String name, String description) {
-        this.name = name;
-        this.description = description;
+        if (name != null) {
+            this.name = name;
+        }
+        if (description != null) {
+            this.description = description;
+        }
         updateUpdatedAt();
     }
 
