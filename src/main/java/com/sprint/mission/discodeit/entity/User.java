@@ -1,40 +1,56 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-@AllArgsConstructor
-public class User extends Base {
-    private UUID profileId;
-    private String username;
-    private int age;
-    private final String email;
-    private String password;
+public class User implements Serializable {
 
-    public void update(String username, Integer age, String password) {
-        if (username != null)
-            this.username = username;
-        if (age != null)
-            this.age = age;
-        if (password != null)
-            this.password = password;
-        updateUpdatedAt();
+  private static final long serialVersionUID = 1L;
+
+  private UUID id;
+  private Instant createdAt;
+  private Instant updatedAt;
+  //
+  private String username;
+  private String email;
+  private String password;
+  private UUID profileId;     // BinaryContent
+
+  public User(String username, String email, String password, UUID profileId) {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+    //
+    this.username = username;
+    this.email = email;
+    this.password = password;
+    this.profileId = profileId;
+  }
+
+  public void update(String newUsername, String newEmail, String newPassword, UUID newProfileId) {
+    boolean anyValueUpdated = false;
+    if (newUsername != null && !newUsername.equals(this.username)) {
+      this.username = newUsername;
+      anyValueUpdated = true;
+    }
+    if (newEmail != null && !newEmail.equals(this.email)) {
+      this.email = newEmail;
+      anyValueUpdated = true;
+    }
+    if (newPassword != null && !newPassword.equals(this.password)) {
+      this.password = newPassword;
+      anyValueUpdated = true;
+    }
+    if (newProfileId != null && !newProfileId.equals(this.profileId)) {
+      this.profileId = newProfileId;
+      anyValueUpdated = true;
     }
 
-    public void updateProfileId(UUID profileId) {
-        this.profileId = profileId;
-        updateUpdatedAt();
+    if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
     }
-
-    @Override
-    public String toString() {
-        return "User {" +
-                "name='" + username + '\'' +
-                ", age=" + age +
-                '}';
-    }
+  }
 }

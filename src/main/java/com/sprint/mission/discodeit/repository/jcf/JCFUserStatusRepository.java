@@ -5,58 +5,54 @@ import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
-@ConditionalOnProperty(
-        name = "discodeit.repository.type",
-        havingValue = "jcf",
-        matchIfMissing = true
-)
 public class JCFUserStatusRepository implements UserStatusRepository {
 
-    private final List<UserStatus> userStatuses = new ArrayList<>();
+  private final Map<UUID, UserStatus> data;
 
-    @Override
-    public UserStatus save(UserStatus userStatus) {
-        for (int i = 0; i < userStatuses.size(); i++) {
-            if (userStatuses.get(i).getId().equals(userStatus.getId())) {
-                userStatuses.set(i, userStatus);
-                return userStatus;
-            }
-        }
+  public JCFUserStatusRepository() {
+    this.data = new HashMap<>();
+  }
 
-            userStatuses.add(userStatus);
-            return userStatus;
-    }
+  @Override
+  public UserStatus save(UserStatus userStatus) {
+    this.data.put(userStatus.getId(), userStatus);
+    return userStatus;
+  }
 
-    @Override
-    public List<UserStatus> findAll() {
-        return List.copyOf(userStatuses);
-    }
+  @Override
+  public Optional<UserStatus> findById(UUID id) {
+    return Optional.ofNullable(this.data.get(id));
+  }
 
-    @Override
-    public Optional<UserStatus> findById(UUID id) {
-        return userStatuses.stream()
-                .filter(userStatus ->
-                        userStatus.getId().equals(id))
-                .findFirst();
-    }
+  @Override
+  public Optional<UserStatus> findByUserId(UUID userId) {
+    return this.findAll().stream()
+        .filter(userStatus -> userStatus.getUserId().equals(userId))
+        .findFirst();
+  }
 
-    @Override
-    public Optional<UserStatus> findByUserId(UUID userId) {
-        return userStatuses.stream()
-                .filter(userStatus ->
-                        userStatus.getUserId().equals(userId))
-                .findFirst();
-    }
+  @Override
+  public List<UserStatus> findAll() {
+    return this.data.values().stream().toList();
+  }
 
-    @Override
-    public void delete(UserStatus userStatus) {
-        userStatuses.removeIf(existingUserStatus ->
-                existingUserStatus.getId().equals(userStatus.getId()));
-    }
+  @Override
+  public boolean existsById(UUID id) {
+    return this.data.containsKey(id);
+  }
+
+  @Override
+  public void deleteById(UUID id) {
+    this.data.remove(id);
+  }
+
+  @Override
+  public void deleteByUserId(UUID userId) {
+    this.findByUserId(userId)
+        .ifPresent(userStatus -> this.deleteByUserId(userStatus.getId()));
+  }
 }
